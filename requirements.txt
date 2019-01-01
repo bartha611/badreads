@@ -1,0 +1,7 @@
+Flask
+Flask-Session
+Flask-WTF
+WTForms
+Flask-login
+psycopg2
+SQLAlchemy
