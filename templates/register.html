@@ -1,26 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Registration Form</title>
-</head>
-<body>
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
-</body>
-</html>
 
-<div class="form-container">
+{% block content %}
+<div class="container">
 	<form method = "POST" action = {{url_for('register')}}>
-		<p>
-			{{ form.username.label }}
-			{{ form.username }}
-		</p>
-		<p>
-			{{ form.password.label }}
-			{{ form.password }}
-		</p>
-		<p>
-			{{ form.confirm.label }}
-			{{ form.confirm }}
-		</p>
+		<dl>
+			{{ wtf.quick_form(form)}}
+		</dl>
 	</form>
-</div> -->
+{% endblock %}
