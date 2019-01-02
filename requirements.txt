@@ -1,5 +1,6 @@
 Flask
 Flask-Session
+Flask-bootstrap
 Flask-WTF
 WTForms
 Flask-login

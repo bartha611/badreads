@@ -1,10 +1,13 @@
 import os
-import WTF_classes
 
 from flask import Flask, session, render_template, request
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField
+from wtforms.validators import InputRequired, EqualTo
 
 app = Flask(__name__)
 
@@ -17,19 +20,28 @@ if not os.getenv("DATABASE_URL"):
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config["SECRET_KEY"] = 'THIS_IS_A_SECRET_KEY'
 Session(app)
 
 # Set up database
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
+class Registration(FlaskForm):
+	username = StringField('username required', validators=[InputRequired()])
+	password = PasswordField('Password', validators=[InputRequired(), 
+		EqualTo('confirm', message = "Passwords must match")])
+	confirm = PasswordField('Confirm Password')
+
 
 @app.route("/")
 def index():
-    return "Project 1: hello"
+    return render_template('login.html')
 
 
-@app.route("/register", methods = ["POST"])
+@app.route("/register", methods = ["GET", "POST"])
 def register():
-	form = Registration(request.form)
+	form = Registration()
+	return render_template('register.html', form = form)
+
 
