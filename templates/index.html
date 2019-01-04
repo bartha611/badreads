@@ -1,9 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Hello world</title>
-</head>
-<body>
-	<h1>Hello world!!!!</h1>
-</body>
-</html>
+{% extends "bootstrap/base.html" %}
+
+{% block styles %}
+{{super()}}
+	<link rel = "stylesheet" type = "text/css" href = "{{url_for('.static',filename='login.css')}}">
+{% endblock %}
+
+{% block content %}
+<h1>Hello bitch ass</h1>
+
+{% with messages = get_flashed_messages() %}
+	{% if messages %}
+		<div class = "alert alert-warning">
+			{% for message in messages %}
+				{{ message }} <br>
+			{% endfor %}
+	{% endif %}
+{% endwith %}
+{% endblock %}

@@ -16,7 +16,7 @@ from flask_bootstrap import Bootstrap
 app = Flask(__name__)
 Bootstrap(app)
 
-os.environ["DATABASE_URL"] = "database_url"
+os.environ["DATABASE_URL"] = "postgres://rstrmsgknaerel:b27002260a792f02d00ba9d23da8e41d1d7a375ea03aa44210fcf8fe4b082a86@ec2-23-23-80-20.compute-1.amazonaws.com:5432/dfofnj4eu4rg1q"
 # Check for environment variable
 if not os.getenv("DATABASE_URL"):
     raise RuntimeError("DATABASE_URL is not set")
@@ -74,14 +74,13 @@ def login():
 		username = request.form["username"]
 		password = request.form["password"]
 		hashed_password = generate_password_hash(password)
-		person = db.execute("SELECT :username, :password FROM person", {"username": username, "password": password}).fetchall()
-		db_person = person[0][0]
-		db_password = person[0][1]
-		print(db_password)
+		person = db.execute("SELECT username, password FROM person WHERE username = :username", {"username": username}).fetchall()
 		if len(person) == 0:
 			flash('Username does not exist')
 			return redirect(url_for('login'))
 		else:
+			db_password = person[0][1]
+			db_person = person[0][0]
 			if username == db_person and check_password_hash(db_password, form.password.data):
 				flash('login successful!!')
 				return redirect(url_for('index'))
@@ -89,6 +88,10 @@ def login():
 				flash('password has failed')
 				return redirect(url_for('login'))
 	return render_template('login.html', form = form)
+
+@app.route("/search", methods = ["GET", "POST"])
+def search():
+	
 
 
 if __name__ == '__main__':
