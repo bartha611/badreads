@@ -6,3 +6,5 @@ WTForms
 Flask-login
 psycopg2
 SQLAlchemy
+python-dotenv
+flask-dotenv

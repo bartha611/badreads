@@ -1,5 +1,7 @@
 import os
 import sys
+from dotenv import load_dotenv
+load_dotenv()
 
 from flask import Flask, session, render_template, request, flash, redirect,  url_for
 from flask_session import Session
@@ -15,8 +17,8 @@ from flask_bootstrap import Bootstrap
 
 app = Flask(__name__)
 Bootstrap(app)
+app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
 
-os.environ["DATABASE_URL"] = "database_url"
 # Check for environment variable
 if not os.getenv("DATABASE_URL"):
     raise RuntimeError("DATABASE_URL is not set")
@@ -24,7 +26,7 @@ if not os.getenv("DATABASE_URL"):
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config["SECRET_KEY"] = 'THIS_IS_A_SECRET_KEY'
+app.config["SECRET_KEY"] = os.getenv('SECRET_KEY')
 Session(app)
 
 # Set up database
@@ -88,9 +90,6 @@ def login():
 				flash('password has failed')
 				return redirect(url_for('login'))
 	return render_template('login.html', form = form)
-
-@app.route("/search", methods = ["GET", "POST"])
-def search():
 	
 
 
