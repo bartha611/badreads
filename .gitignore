@@ -1,4 +1,4 @@
 .env
 .flaskenv
-__pycache__
+__pycache__/
 books.csv
