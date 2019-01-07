@@ -25,7 +25,7 @@ if not os.getenv("DATABASE_URL"):
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config["SECRET_KEY"] = os.getenv('SECRET_KEY')
+app.config["SECRET_KEY"] = 'This_is_a_secret_key'
 Session(app)
 
 # Set up database
@@ -61,7 +61,7 @@ def register():
 @app.route("/login", methods = ["GET","POST"])
 def login():
 	form = Login()
-	if request.method == "POST":
+	if request.method == "POST" and form.validate_on_submit():
 		if 'username' in session:
 			flash('You are already logged in')
 			return redirect(url_for('index'))
@@ -89,19 +89,20 @@ def search():
 	form = SearchForm()
 	if request.method == "POST":
 		query = request.form["search"]
-		return query
-		# try:
-		# 	number_query = int(query)
-		# 	results = db.execute("SELECT bookId, title, author, year FROM books WHERE isbn = :isbn", 
-		# 		{"isbn":number_query}).fetchall()
-		# 	if results == None:
-		# 		flash('No results')
-		# 		return redirect(url_for('search'))
-		# except ValueError:
-
-
-		return redirect(url_for('search'))
+		try:
+			num_query = int(query)
+			return redirect(url_for('search_results', query=query))
+		except ValueError:
+			return "ValueError"
 	return render_template('search.html', form=form)
+
+@app.route('/search_results', methods=["GET", "POST"])
+def search_results():
+	query = int(request.args.get('query'))
+	results = db.execute("SELECT isbn,title,author FROM books WHERE isbn LIKE '%:isbn%'", {"isbn":query}).fetchall()
+	for result in results:
+		print(result.title)
+	return render_template('search_results.html', messages=results)
 	
 
 if __name__ == '__main__':
