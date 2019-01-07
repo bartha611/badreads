@@ -1,0 +1,13 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+<div class = "container">
+	<form id = "form-control" method = "Post" action = {{url_for('search')}}>
+		<dl>
+			{{ wtf.quick_form(form) }}
+		</dl>
+	</form>
+</div>
+
+{% endblock %}

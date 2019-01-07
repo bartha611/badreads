@@ -1,5 +1,7 @@
 import os
 import sys
+from WTF_classes import Registration, Login, SearchForm
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -8,9 +10,6 @@ from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import InputRequired, EqualTo, Length, Email
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from flask_bootstrap import Bootstrap
@@ -33,18 +32,6 @@ Session(app)
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
-class Registration(FlaskForm):
-	username = StringField('username', validators=[InputRequired(), Length(min=10, max=70), Email("must provide a valid email between 10 to 70 characters")])
-	password = PasswordField('Password', validators=[InputRequired(), 
-		EqualTo('confirm', message = "Passwords must match")])
-	confirm = PasswordField('Confirm Password')
-	submit = SubmitField('Submit')
-
-class Login(FlaskForm):
-	username = StringField('username', validators = [InputRequired(), Length(min=10, max=70), Email("must provide a valid email between 10 to 70 characters")])
-	password = PasswordField('Password', validators = [InputRequired()])
-	submit = SubmitField('Submit')
-
 
 @app.route("/")
 def index():
@@ -63,8 +50,10 @@ def register():
 			flash(u'Username already exists!', 'error')
 			print(check_user_exists)
 			return redirect(url_for('register'))
-		db.execute("INSERT INTO person(username, password) VALUES (:username, :password)", {"username": username, "password": hashed_password})
+		db.execute("INSERT INTO person(username, password) VALUES (:username, :password)", 
+			{"username": username, "password": hashed_password})
 		db.commit()
+		flash('You have successfully registered')
 		return redirect(url_for('index'))
 	return render_template('register.html', form = form)
 
@@ -73,6 +62,9 @@ def register():
 def login():
 	form = Login()
 	if request.method == "POST":
+		if 'username' in session:
+			flash('You are already logged in')
+			return redirect(url_for('index'))
 		username = request.form["username"]
 		password = request.form["password"]
 		hashed_password = generate_password_hash(password)
@@ -84,6 +76,7 @@ def login():
 			db_password = person[0][1]
 			db_person = person[0][0]
 			if username == db_person and check_password_hash(db_password, form.password.data):
+				session['username'] = username
 				flash('login successful!!')
 				return redirect(url_for('index'))
 			elif check_password_hash(password, db_password) == False:
@@ -91,7 +84,25 @@ def login():
 				return redirect(url_for('login'))
 	return render_template('login.html', form = form)
 	
+@app.route('/search', methods = ["GET", "POST"])
+def search():
+	form = SearchForm()
+	if request.method == "POST":
+		query = request.form["search"]
+		return query
+		# try:
+		# 	number_query = int(query)
+		# 	results = db.execute("SELECT bookId, title, author, year FROM books WHERE isbn = :isbn", 
+		# 		{"isbn":number_query}).fetchall()
+		# 	if results == None:
+		# 		flash('No results')
+		# 		return redirect(url_for('search'))
+		# except ValueError:
 
+
+		return redirect(url_for('search'))
+	return render_template('search.html', form=form)
+	
 
 if __name__ == '__main__':
 	app.run(debug=True)
