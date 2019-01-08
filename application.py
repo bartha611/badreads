@@ -87,21 +87,21 @@ def login():
 @app.route('/search', methods = ["GET", "POST"])
 def search():
 	form = SearchForm()
-	if request.method == "POST":
+	if request.method == "POST" and form.validate_on_submit():
 		query = request.form["search"]
-		try:
-			num_query = int(query)
-			return redirect(url_for('search_results', query=query))
-		except ValueError:
-			return "ValueError"
+		return redirect(url_for('search_results',query=query))
 	return render_template('search.html', form=form)
 
 @app.route('/search_results', methods=["GET", "POST"])
 def search_results():
-	query = int(request.args.get('query'))
-	results = db.execute("SELECT isbn,title,author FROM books WHERE isbn LIKE '%:isbn%'", {"isbn":query}).fetchall()
-	for result in results:
-		print(result.title)
+	try:
+		query = int(request.args.get('query'))
+		results = db.execute("SELECT isbn,title,author FROM books WHERE isbn LIKE '%:isbn%'", {"isbn":query}).fetchall()
+	except ValueError:
+		query = '%' + query + '%'
+		results = db.execute("""SELECT isbn,title,author,year FROM books
+		 WHERE UPPER(author) LIKE UPPER(:query) or
+		 UPPER(TITLE) LIKE UPPER(:query)""", {"query":query}).fetchall()
 	return render_template('search_results.html', messages=results)
 	
 

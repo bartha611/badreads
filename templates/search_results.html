@@ -6,7 +6,10 @@
 {% if messages %}
 	{% for messages in messages %}
 		<div class = "list-group">
-			{{ messages }} <br>
+			<li class="list-group-item">
+				<h2>{{ messages.title }}</h2>
+				<h5>{{ messages.author }}</h5>
+			</li>
 		</div>
 	{% endfor %}
 {% else %}
