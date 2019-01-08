@@ -94,8 +94,9 @@ def search():
 
 @app.route('/search_results', methods=["GET", "POST"])
 def search_results():
+	query = request.args.get('query')
 	try:
-		query = int(request.args.get('query'))
+		query = int(query)
 		results = db.execute("SELECT isbn,title,author FROM books WHERE isbn LIKE '%:isbn%'", {"isbn":query}).fetchall()
 	except ValueError:
 		query = '%' + query + '%'
