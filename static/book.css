@@ -1,0 +1,14 @@
+#result {
+	width: 70%;
+	margin: 0 auto;
+	text-align: center;
+}
+table {
+	margin: 0 auto;
+}
+table, th, td {
+  font-size: 15px;
+}
+th,td {
+	width: 100px;
+}

@@ -1,7 +1,8 @@
 CREATE TABLE person (
 	personId SERIAL PRIMARY KEY,
 	username VARCHAR(50) NOT NULL,
-	password VARCHAR NOT NULL
+	password VARCHAR NOT NULL,
+	email VARCHAR(70) NOT NULL
 );
 CREATE TABLE books (
 	bookId SERIAL PRIMARY KEY,
@@ -15,6 +16,6 @@ CREATE TABLE reviews (
 	reviewId SERIAL PRIMARY KEY,
 	review_rating SMALLINT NOT NULL,
 	review_text TEXT,
-	personId INT REFERENCES person,
+	username VARCHAR(50) REFERENCES person,
 	bookId INT REFERENCES books
 );

@@ -1,12 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>BadReads</title>
-</head>
-<body>
-	<h1>{% Block Heading %}{% endblock %}</h1>
-	{% Block body %}
-	{% endblock %}
+{% extends "bootstrap/base.html" %}
 
-</body>
-</html>
+{% block content %}
+<nav class="navbar navbar-inverse">
+	<div class="navbar-header">
+		<a class="navbar-brand" href = {{ url_for('index') }} >BadReads</a>
+	</div>
+	<ul class="nav navbar-nav">
+		<li><a href = {{ url_for('index') }}>Home</a></li>
+		<li><a href= {{ url_for('search') }}>Search</a></li>
+		{% if session['username'] %}
+			<li><a href= {{ url_for('logout') }}>Logout</a></li>
+		{% else %}
+			<li><a href = {{ url_for('login') }}>Login</a></li>
+			<li><a href= {{ url_for('register') }}>Sign-up</a></li>
+		{% endif %}
+	</ul>
+</nav>
+{% endblock %}

@@ -2,6 +2,7 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block content %}
+{% include "layout.html" %}
 <div class = "container">
 	<form id = "form-control" method = "Post" action = {{url_for('search')}}>
 		<dl>

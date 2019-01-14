@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<h1>Hello World</h1>
+{% include "layout.html" %}
 
 {% with messages = get_flashed_messages() %}
 	{% if messages %}

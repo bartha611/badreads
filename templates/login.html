@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block content %}
+{% include "layout.html" %}
 <div class="container">
 	<h2 id = title>Login into Badreads!</h2>
 	<form id = "form_groups" method = "POST" action = {{url_for('login')}}>

@@ -1,0 +1,49 @@
+{% extends "bootstrap/base.html" %}
+
+{% block styles %}
+	<link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'book.css') }}>
+{% endblock %}
+
+{% block content %}
+{% include "layout.html" %}
+{% if book %}
+	<div id = "result">
+		{% for book in book %}
+			<h2 id = "title">{{ book.title }}</h2>
+			<h4> By {{ book.author }}</h4>
+			<table>
+				<tr>
+					<th>Year</th>
+					<td>{{ book.year }}</td>
+				</tr>
+				<tr>
+					<th>Isbn</th>
+					<td>{{ book.isbn }}</td>
+				</tr>
+				<tr>
+					<th>Rating</th>
+					<td>{{ book.average_score }}</td>
+				</tr>
+			</table>
+		{% endfor %}
+	<div class="userReview">
+		{% if user_review|length != 0 %}
+			<h4>My Activity</h4>
+			<table>
+				<tr>
+					<th>Review of</th>
+					<td>{{ book.isbn }}</td>
+				</tr>
+				<tr>
+					<th>Rating</th>
+					<td>{{user_review.review_rating }}</td>
+				</tr>
+			</table>
+		{% endif %}
+	</div>
+	</div>
+
+{% else %}
+	<h1>Book isn't present in database</h1>
+{% endif %}
+{% endblock %}

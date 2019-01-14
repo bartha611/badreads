@@ -44,14 +44,17 @@ def register():
 	if request.method == "POST" and form.validate_on_submit():
 		username = request.form["username"]
 		password = request.form["password"]
+		email = request.form["email"]
 		hashed_password = generate_password_hash(password)
-		check_user_exists = db.execute("SELECT username FROM person WHERE username = :user", {"user":username}).fetchall()
-		if len(check_user_exists) != 0:
-			flash(u'Username already exists!', 'error')
-			print(check_user_exists)
+		check_email_exists = db.execute("SELECT email FROM person WHERE email = :email", 
+			{"email": email}).fetchall()
+		check_username_exists = db.execute("SELECT username FROM person WHERE username = :username",
+			{"username":username})
+		if len(check_user_exists) != 0 and len(check_username_exists) != 0:
+			flash(u'Email and/or username already exists!', 'error')
 			return redirect(url_for('register'))
-		db.execute("INSERT INTO person(username, password) VALUES (:username, :password)", 
-			{"username": username, "password": hashed_password})
+		db.execute("INSERT INTO person(username, password, email) VALUES (:username, :password, :email)", 
+			{"username": username, "password": hashed_password, "email": email})
 		db.commit()
 		flash('You have successfully registered')
 		return redirect(url_for('index'))
@@ -65,24 +68,32 @@ def login():
 		if 'username' in session:
 			flash('You are already logged in')
 			return redirect(url_for('index'))
-		username = request.form["username"]
+		email = request.form["email"]
 		password = request.form["password"]
 		hashed_password = generate_password_hash(password)
-		person = db.execute("SELECT username, password FROM person WHERE username = :username", {"username": username}).fetchall()
+		person = db.execute("SELECT username, email, password FROM person WHERE email = :email", 
+			{"email": email}).fetchall()
 		if len(person) == 0:
-			flash('Username does not exist')
+			flash('Email does not exist in database')
 			return redirect(url_for('login'))
 		else:
-			db_password = person[0][1]
-			db_person = person[0][0]
-			if username == db_person and check_password_hash(db_password, form.password.data):
-				session['username'] = username
+			for person in person:
+				db_password = person.password
+				db_email = person.email
+				db_username = person.username
+			if email == db_email and check_password_hash(db_password, form.password.data):
+				session['username'] = db_username
 				flash('login successful!!')
 				return redirect(url_for('index'))
 			elif check_password_hash(password, db_password) == False:
 				flash('password has failed')
 				return redirect(url_for('login'))
 	return render_template('login.html', form = form)
+
+@app.route("/logout")
+def logout():
+	session.pop('username', None)
+	return redirect(url_for('index'))
 	
 @app.route('/search', methods = ["GET", "POST"])
 def search():
@@ -97,13 +108,28 @@ def search_results():
 	query = request.args.get('query')
 	try:
 		query = int(query)
-		results = db.execute("SELECT isbn,title,author FROM books WHERE isbn LIKE '%:isbn%'", {"isbn":query}).fetchall()
+		results = db.execute("SELECT isbn,title,author FROM books WHERE isbn LIKE '%:isbn%'", 
+			{"isbn":query}).fetchall()
 	except ValueError:
 		query = '%' + query + '%'
 		results = db.execute("""SELECT isbn,title,author,year FROM books
 		 WHERE UPPER(author) LIKE UPPER(:query) or
 		 UPPER(TITLE) LIKE UPPER(:query)""", {"query":query}).fetchall()
 	return render_template('search_results.html', messages=results)
+
+@app.route('/book/<title>', methods = ["GET", "POST"])
+def book(title):
+	book_result = db.execute("SELECT * FROM books WHERE title = :title",
+		{"title": title}).fetchall()
+	bookId = book_result[0][0]
+	book_reviews = db.execute("SELECT * FROM reviews WHERE bookid = :bookid", 
+		{"bookid":bookId}).fetchall()
+	username = session['username']
+	user_review = db.execute("SELECT * FROM reviews WHERE username = :username",
+		{"username":username}).fetchall()
+	return render_template('book.html', book = book_result, reviews = book_reviews, user_review = user_review)
+
+
 	
 
 if __name__ == '__main__':
