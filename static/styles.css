@@ -1,0 +1,20 @@
+ul#horizontal {
+	list-style-type: none;
+	display: inline-block;
+}
+li.star {
+	display: inline-block;
+	cursor:pointer;
+}
+.fa-star {
+	color: #ccc;
+}
+.star-rating ul > li.star.hover > i.fa {
+	color: yellow;
+}
+.star-rating ul > li.star.selected > i.fa {
+	color: orange;
+}
+.star-rating ul > li.star.current > i.fa {
+	color: orange;
+}

@@ -1,11 +1,12 @@
 import os
 import sys
 from WTF_classes import Registration, Login, SearchForm
+import urllib.request
 
 from dotenv import load_dotenv
 load_dotenv()
 
-from flask import Flask, session, render_template, request, flash, redirect,  url_for
+from flask import Flask, session, render_template, request, flash, redirect,  url_for,jsonify
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -17,6 +18,7 @@ from flask_bootstrap import Bootstrap
 app = Flask(__name__)
 Bootstrap(app)
 app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
+app.config['UPLOAD_FOLDER'] = os.path.join('/static', 'img')
 
 # Check for environment variable
 if not os.getenv("DATABASE_URL"):
@@ -49,8 +51,8 @@ def register():
 		check_email_exists = db.execute("SELECT email FROM person WHERE email = :email", 
 			{"email": email}).fetchall()
 		check_username_exists = db.execute("SELECT username FROM person WHERE username = :username",
-			{"username":username})
-		if len(check_user_exists) != 0 and len(check_username_exists) != 0:
+			{"username":username}).fetchall()
+		if len(check_username_exists) != 0 and len(check_username_exists) != 0:
 			flash(u'Email and/or username already exists!', 'error')
 			return redirect(url_for('register'))
 		db.execute("INSERT INTO person(username, password, email) VALUES (:username, :password, :email)", 
@@ -108,7 +110,7 @@ def search_results():
 	query = request.args.get('query')
 	try:
 		query = int(query)
-		results = db.execute("SELECT isbn,title,author FROM books WHERE isbn LIKE '%:isbn%'", 
+		results = db.execute("SELECT isbn,title,author,year FROM books WHERE isbn LIKE '%:isbn%'", 
 			{"isbn":query}).fetchall()
 	except ValueError:
 		query = '%' + query + '%'
@@ -117,20 +119,72 @@ def search_results():
 		 UPPER(TITLE) LIKE UPPER(:query)""", {"query":query}).fetchall()
 	return render_template('search_results.html', messages=results)
 
-@app.route('/book/<title>', methods = ["GET", "POST"])
-def book(title):
-	book_result = db.execute("SELECT * FROM books WHERE title = :title",
-		{"title": title}).fetchall()
-	bookId = book_result[0][0]
+@app.route('/book/<isbn>', methods = ["POST", "GET"])
+def book(isbn):
+	book_result = db.execute("SELECT * FROM books WHERE isbn = :isbn",
+		{"isbn": isbn}).fetchall()
+	bookId = book_result[0].bookid
+	book_image_url = 'http://covers.openlibrary.org/b/isbn/' + isbn + '-M.jpg'
+	urllib.request.urlretrieve(book_image_url, "static/image.jpg")
 	book_reviews = db.execute("SELECT * FROM reviews WHERE bookid = :bookid", 
 		{"bookid":bookId}).fetchall()
 	username = session['username']
-	user_review = db.execute("SELECT * FROM reviews WHERE username = :username",
-		{"username":username}).fetchall()
+	user_review = db.execute("""
+		SELECT * FROM reviews
+		JOIN person ON (person.personid = reviews.personid)
+		WHERE username = :username AND bookid = :bookid
+		""", {"username":username, "bookid":bookId}).fetchall()
 	return render_template('book.html', book = book_result, reviews = book_reviews, user_review = user_review)
 
+@app.route('/add_rating', methods = ["POST"])
+def add_rating():
+	isbn = request.json['isbn']
+	stars = request.json['stars']
+	username = session['username']
+	current_rating = request.json['current_rating']
+	userid = db.execute("""
+		SELECT personid
+		FROM person 
+		WHERE username = :username""",
+		{"username":username}).first()
+	bookid = db.execute("""
+		SELECT bookid
+		FROM books
+		WHERE isbn = :isbn""",
+		{"isbn":isbn}).first()
+	if current_rating == None:
+		db.execute("INSERT INTO reviews(review_rating, personid, bookid) VALUES (:rating, :personid, :bookid)", 
+		{"rating":stars, "personid":userid[0], "bookid":bookid[0]})
+		db.commit()
+		db.execute("""
+			UPDATE books
+			SET average_score = 
+			(SELECT AVG(reviews.review_rating)
+			FROM reviews
+			INNER JOIN books ON (reviews.bookId = books.bookId)
+			WHERE books.isbn = :isbn)
+			WHERE books.isbn = :isbn
+			""", {"isbn": isbn})
+		db.commit()
+	else:
+		return "hello"
+	return jsonify({'isbn':isbn, 'stars': stars})
 
-	
+@app.route('/get_user_rating', methods = ["GET"])
+def get_user_rating():
+	isbn = request.args.get('isbn')
+	username = session['username']
+	user_rating = db.execute("""
+		SELECT review_rating
+		FROM reviews AS r
+		INNER JOIN person ON (r.personid = person.personid)
+		INNER JOIN books ON (r.bookid = books.bookid)
+		WHERE isbn = :isbn AND username = :username""",
+		{"isbn": isbn, "username": username}).fetchall()
+	if len(user_rating) == 0:
+		return jsonify({'user_rating': None})
+	return jsonify({'user_rating': user_rating[0].review_rating})
+
 
 if __name__ == '__main__':
 	app.run(debug=True)

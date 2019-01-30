@@ -16,6 +16,6 @@ CREATE TABLE reviews (
 	reviewId SERIAL PRIMARY KEY,
 	review_rating SMALLINT NOT NULL,
 	review_text TEXT,
-	username VARCHAR(50) REFERENCES person,
+	personId INT  REFERENCES person,
 	bookId INT REFERENCES books
 );

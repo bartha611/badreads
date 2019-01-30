@@ -9,7 +9,7 @@
 	{% for messages in messages %}
 		<div class = "list-group">
 			<li class="list-group-item">
-				<h2><a href = {{ url_for('book', title = messages.title) }}>{{ messages.title }}</a></h2>
+				<h2><a href = {{ url_for('book', isbn = messages.isbn) }}>{{ messages.title }}</a></h2>
 				<h5>by {{ messages.author }}</h5>
 			</li>
 		</div>

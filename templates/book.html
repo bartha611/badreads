@@ -7,43 +7,58 @@
 {% block content %}
 {% include "layout.html" %}
 {% if book %}
-	<div id = "result">
-		{% for book in book %}
-			<h2 id = "title">{{ book.title }}</h2>
-			<h4> By {{ book.author }}</h4>
-			<table>
-				<tr>
-					<th>Year</th>
-					<td>{{ book.year }}</td>
-				</tr>
-				<tr>
-					<th>Isbn</th>
-					<td>{{ book.isbn }}</td>
-				</tr>
-				<tr>
-					<th>Rating</th>
-					<td>{{ book.average_score }}</td>
-				</tr>
-			</table>
-		{% endfor %}
-	<div class="userReview">
-		{% if user_review|length != 0 %}
-			<h4>My Activity</h4>
-			<table>
-				<tr>
-					<th>Review of</th>
-					<td>{{ book.isbn }}</td>
-				</tr>
-				<tr>
-					<th>Rating</th>
-					<td>{{user_review.review_rating }}</td>
-				</tr>
-			</table>
-		{% endif %}
+<div class="container" id="book-content">
+    {% for book in book %}
+    <div id="book-image">
+        <img src = "/static/image.jpg">
+        {% include "star.html" %}
 	</div>
-	</div>
-
-{% else %}
-	<h1>Book isn't present in database</h1>
+    <div id="book-info">
+        <h1 id="title">{{ book.title }}</h1>
+        <h3 id="author"> By {{ book.author }}</h3>
+        <table>
+            <tr>
+                <th>Year</th>
+                <td>{{ book.year }}</td>
+            </tr>
+            <tr>
+                <th>Isbn</th>
+                <td id = "book-isbn">{{ book.isbn }}</td>
+            </tr>
+            <tr>
+                <th>Rating</th>
+                <td>{{ book.average_score }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="container" id = "user-review">
+	{% if user_review|length != 0 %}
+	{% for review in user_review %}
+		<h4 id = "user-activity">My Activity</h4>
+		<table>
+			<tr>
+				<th>Review of</th>
+				<td>{{ book.isbn }}</td>
+			</tr>
+			<tr>
+				<th>Rating</th>
+				<td id = "user-rating">{{ review.review_rating }}</td>
+			</tr>
+			<tr>
+				{% if review.review_text %}
+				<th>Review</th>
+				<td>{{review.review_text }}</td>
+				{% else %}
+				<td>add review</td>
+				{% endif %}
+			</tr>
+		</table>
+	{% else %}
+		<h3>add review</h3>
+	{% endfor %}
+	{% endif %}
+</div>
+{% endfor %}
 {% endif %}
 {% endblock %}

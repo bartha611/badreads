@@ -1,14 +1,38 @@
 #result {
-	width: 70%;
-	margin: 0 auto;
-	text-align: center;
+	width: 60%;
 }
-table {
-	margin: 0 auto;
+.container {
+	display: flex;
+	flex-wrap: wrap;
+}
+#title {
+	margin: 0;
+}
+#author {
+	margin-top: 5px;
+}
+.star-rating {
+	margin-top: 10px;
+}
+#book-image {
+	height: 100%;
+	float: left;
+	margin-right: 20px;
+}
+#book-info {
+	width:500px;
+	float: right;
+	text-decoration: underline;
 }
 table, th, td {
   font-size: 15px;
 }
 th,td {
 	width: 100px;
+}
+#user-activity {
+	text-decoration: underline;
+}
+#user-review {
+	display: block;
 }
