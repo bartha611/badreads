@@ -158,16 +158,36 @@ def add_rating():
 		db.commit()
 		db.execute("""
 			UPDATE books
-			SET average_score = 
-			(SELECT AVG(reviews.review_rating)
-			FROM reviews
-			INNER JOIN books ON (reviews.bookId = books.bookId)
-			WHERE books.isbn = :isbn)
+				SET average_score = 
+				(SELECT AVG(reviews.review_rating)
+				FROM reviews
+				INNER JOIN books ON (reviews.bookId = books.bookId)
+				WHERE books.isbn = :isbn),
+				review_count = 
+				(SELECT COUNT(reviews.review_rating)
+				FROM reviews
+				INNER JOIN books ON (books.bookId = reviews.bookId)
+				WHERE books.isbn = :isbn)
 			WHERE books.isbn = :isbn
 			""", {"isbn": isbn})
 		db.commit()
 	else:
-		return "hello"
+		db.execute("""
+			UPDATE reviews
+				SET review_rating = :stars
+			WHERE reviews.personId = :userid
+			""",{"stars":stars,"userid":userid[0]})
+		db.commit()
+		db.execute("""
+			UPDATE books
+				SET average_score = 
+				(SELECT AVG(reviews.review_rating)
+				FROM reviews
+				INNER JOIN books ON (reviews.bookId = books.bookId)
+				WHERE books.isbn = :isbn)
+			WHERE books.isbn = :isbn
+			""", {"isbn": isbn})
+		db.commit()
 	return jsonify({'isbn':isbn, 'stars': stars})
 
 @app.route('/get_user_rating', methods = ["GET"])
@@ -175,7 +195,7 @@ def get_user_rating():
 	isbn = request.args.get('isbn')
 	username = session['username']
 	user_rating = db.execute("""
-		SELECT review_rating
+		SELECT r.review_rating
 		FROM reviews AS r
 		INNER JOIN person ON (r.personid = person.personid)
 		INNER JOIN books ON (r.bookid = books.bookid)
@@ -184,6 +204,15 @@ def get_user_rating():
 	if len(user_rating) == 0:
 		return jsonify({'user_rating': None})
 	return jsonify({'user_rating': user_rating[0].review_rating})
+
+@app.route('/api/<isbn>', methods = ["GET"])
+def api(isbn):
+	data = db.execute("""
+		SELECT *
+		FROM books
+		WHERE isbn = :isbn""",{"isbn":isbn}).fetchall()
+	d = [dict(row) for row in data]
+	return jsonify(d[0])
 
 
 if __name__ == '__main__':

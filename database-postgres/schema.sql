@@ -10,7 +10,8 @@ CREATE TABLE books (
 	title VARCHAR NOT NULL,
 	author VARCHAR(30) NOT NULL,
 	year SMALLINT NOT NULL,
-	average_score FLOAT(3) NOT NULL DEFAULT 0
+	average_score FLOAT(3) NOT NULL DEFAULT 0,
+	review_count INT NOT NULL DEFAULT 0
 );
 CREATE TABLE reviews (
 	reviewId SERIAL PRIMARY KEY,
