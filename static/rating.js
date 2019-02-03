@@ -1,5 +1,7 @@
 $(document).ready(function() {
-	var isbn = document.getElementById('book-isbn').innerHTML
+	var pathname = window.location.pathname;
+	var isbn = pathname.split("/")[2]
+	console.log(isbn)
 	$.ajax({
 		url: '/get_user_rating',
 		type: 'GET',

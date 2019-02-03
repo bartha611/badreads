@@ -110,11 +110,11 @@ def search_results():
 	query = request.args.get('query')
 	try:
 		query = int(query)
-		results = db.execute("SELECT isbn,title,author,year FROM books WHERE isbn LIKE '%:isbn%'", 
+		results = db.execute("SELECT * FROM books WHERE isbn LIKE '%:isbn%'", 
 			{"isbn":query}).fetchall()
 	except ValueError:
 		query = '%' + query + '%'
-		results = db.execute("""SELECT isbn,title,author,year FROM books
+		results = db.execute("""SELECT * FROM books
 		 WHERE UPPER(author) LIKE UPPER(:query) or
 		 UPPER(TITLE) LIKE UPPER(:query)""", {"query":query}).fetchall()
 	return render_template('search_results.html', messages=results)
@@ -125,16 +125,27 @@ def book(isbn):
 		{"isbn": isbn}).fetchall()
 	bookId = book_result[0].bookid
 	book_image_url = 'http://covers.openlibrary.org/b/isbn/' + isbn + '-M.jpg'
-	urllib.request.urlretrieve(book_image_url, "static/image.jpg")
+	img_src = "static/" + isbn + ".jpg"
+	print(img_src)
+	urllib.request.urlretrieve(book_image_url, img_src)
 	book_reviews = db.execute("SELECT * FROM reviews WHERE bookid = :bookid", 
 		{"bookid":bookId}).fetchall()
+	img_src = "/" + img_src
 	username = session['username']
 	user_review = db.execute("""
 		SELECT * FROM reviews
 		JOIN person ON (person.personid = reviews.personid)
 		WHERE username = :username AND bookid = :bookid
 		""", {"username":username, "bookid":bookId}).fetchall()
-	return render_template('book.html', book = book_result, reviews = book_reviews, user_review = user_review)
+	return render_template('book.html', book = book_result, reviews = book_reviews, user_review = user_review,image = img_src)
+
+@app.route('/review/<isbn>', methods = ["GET","POST"])
+def review(isbn):
+	review_book = db.execute("""
+		SELECT *
+		FROM books
+		WHERE isbn = :isbn""", {"isbn":isbn}).fetchall()
+	return render_template('review_edit.html', book = review_book)
 
 @app.route('/add_rating', methods = ["POST"])
 def add_rating():
@@ -213,6 +224,7 @@ def api(isbn):
 		WHERE isbn = :isbn""",{"isbn":isbn}).fetchall()
 	d = [dict(row) for row in data]
 	return jsonify(d[0])
+
 
 
 if __name__ == '__main__':

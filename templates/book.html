@@ -10,7 +10,7 @@
 <div class="container" id="book-content">
     {% for book in book %}
     <div id="book-image">
-        <img src = "/static/image.jpg">
+        <img src = "{{image}}">
         {% include "star.html" %}
 	</div>
     <div id="book-info">
@@ -50,7 +50,8 @@
 				<th>Review</th>
 				<td>{{review.review_text }}</td>
 				{% else %}
-				<td>add review</td>
+				<th>Review</th>
+				<td><a href="{{url_for('review', isbn = book.isbn)}}">Add Review</a></td>
 				{% endif %}
 			</tr>
 		</table>

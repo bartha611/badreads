@@ -1,0 +1,28 @@
+{% block styles %}
+	<link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'review_edit.css') }}>
+{% endblock %}
+
+{% block javascript %}
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script type="text/javascript" src = {{url_for('static', filename = 'character_count.js')}}></script>
+{% endblock %}
+
+
+{% block content %}
+{% include "layout.html" %}
+
+{% for book in book %}
+<div class="main_content">
+	<div id = "book-content">
+		<h2 id = "book-title">{{book.title}}</h2>
+		<span id = "author">By {{book.author}}</span>
+	</div>
+	<div id="user_rating">My rating: {% include "star.html" %}</div>
+	<div id="review_box">
+		<p>What did you Think of this book?</p>
+		<textarea id = "review" class = "form-control" rows = "12" placeholder = "Enter your review (optional)" maxlength = "20000"></textarea>
+	</div>
+	<div id = "character-count">20000 characters left</div>
+</div>
+{% endfor %}
+{% endblock %}
