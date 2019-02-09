@@ -131,13 +131,17 @@ def book(isbn):
 	book_reviews = db.execute("SELECT * FROM reviews WHERE bookid = :bookid", 
 		{"bookid":bookId}).fetchall()
 	img_src = "/" + img_src
-	username = session['username']
-	user_review = db.execute("""
-		SELECT * FROM reviews
-		JOIN person ON (person.personid = reviews.personid)
-		WHERE username = :username AND bookid = :bookid
-		""", {"username":username, "bookid":bookId}).fetchall()
-	return render_template('book.html', book = book_result, reviews = book_reviews, user_review = user_review,image = img_src)
+	try:
+		username = session['username']
+		user_review = db.execute("""
+			SELECT * FROM reviews
+			JOIN person ON (person.personid = reviews.personid)
+			WHERE username = :username AND bookid = :bookid
+			""", {"username":username, "bookid":bookId}).fetchall()
+		return render_template('book.html', book = book_result, reviews = book_reviews, user_review = user_review,image = img_src)
+	except:
+		flash('User not logged in')
+		return redirect(url_for('index'))
 
 @app.route('/review/<isbn>', methods = ["GET","POST"])
 def review(isbn):
@@ -215,6 +219,23 @@ def get_user_rating():
 	if len(user_rating) == 0:
 		return jsonify({'user_rating': None})
 	return jsonify({'user_rating': user_rating[0].review_rating})
+
+@app.route('/add_review', methods = ["POST"])
+def add_review():
+	review_bookid = request.args.get('book_id')
+	review_text = request.form['review']
+	username = session['username']
+	userid = db.execute("""
+		SELECT personid
+		FROM person 
+		WHERE username = :username""",
+		{"username":username}).first()
+	db.execute("""
+		UPDATE reviews
+			SET review_text = :review
+		WHERE reviews.personid = :userid""", {"userid":userid[0], "review":review_text})
+	db.commit()
+	return redirect(url_for('index'))
 
 @app.route('/api/<isbn>', methods = ["GET"])
 def api(isbn):

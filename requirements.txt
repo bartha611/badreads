@@ -9,3 +9,4 @@ SQLAlchemy
 python-dotenv
 flask-dotenv
 gunicorn
+boto

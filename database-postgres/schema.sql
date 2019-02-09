@@ -12,6 +12,7 @@ CREATE TABLE books (
 	year SMALLINT NOT NULL,
 	average_score FLOAT(3) NOT NULL DEFAULT 0,
 	review_count INT NOT NULL DEFAULT 0
+	imageFilePath VARCHAR
 );
 CREATE TABLE reviews (
 	reviewId SERIAL PRIMARY KEY,

@@ -17,12 +17,19 @@
 		<h2 id = "book-title">{{book.title}}</h2>
 		<span id = "author">By {{book.author}}</span>
 	</div>
-	<div id="user_rating">My rating: {% include "star.html" %}</div>
+	<div id="user_rating">
+		<label>My rating: </label>
+		<div id="stars">{% include "star.html" %}</div>
+		<span id = "clear">Clear</span>
+	</div>
 	<div id="review_box">
 		<p>What did you Think of this book?</p>
-		<textarea id = "review" class = "form-control" rows = "12" placeholder = "Enter your review (optional)" maxlength = "20000"></textarea>
+		<form method="POST" name = "reviewForm" action={{url_for('add_review',book_id = book.bookid)}}>
+			<textarea id = "review" name = "review" class = "form-control" rows = "12" placeholder = "Enter your review (optional)" maxlength = "20000"></textarea>
+			<div id = "character-count">20000 characters left</div>
+			<input type="submit" value = "Save">
+		</form>
 	</div>
-	<div id = "character-count">20000 characters left</div>
 </div>
 {% endfor %}
 {% endblock %}
