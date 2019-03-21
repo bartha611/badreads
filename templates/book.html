@@ -10,7 +10,7 @@
 <div class="container" id="book-content">
     {% for book in book %}
     <div id="book-image">
-        <img src = "{{image}}">
+       	<img src = {{book.image_path}}>
         {% include "star.html" %}
 	</div>
     <div id="book-info">
@@ -62,4 +62,24 @@
 </div>
 {% endfor %}
 {% endif %}
+<div class = "container" id = "reviews">
+	<h4 id = "Community-reviews">Community Reviews</h4>
+	{%if reviews %}
+	{% for review in reviews %}
+		<div class="row">
+			<div class="col-sm-3">{{ review.username }}</div>
+			<div class="col-sm-9">
+				<p>Rated it {{review.review_rating}} stars</p>
+				{% if review.review_text|length != 0 %}
+				<p>{{ review.review_text }}</p>
+				{% else %}
+				<p>No review</p>
+				{% endif %}
+			</div>
+		</div>
+	{% endfor %}
+	{% else %}
+	<h4>No reviews for this book</h4>
+	{% endif %}
+</div>
 {% endblock %}

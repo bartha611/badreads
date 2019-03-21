@@ -121,24 +121,26 @@ def search_results():
 
 @app.route('/book/<isbn>', methods = ["POST", "GET"])
 def book(isbn):
+	print(session['username'])
 	book_result = db.execute("SELECT * FROM books WHERE isbn = :isbn",
 		{"isbn": isbn}).fetchall()
 	bookId = book_result[0].bookid
-	book_image_url = 'http://covers.openlibrary.org/b/isbn/' + isbn + '-M.jpg'
-	img_src = "static/" + isbn + ".jpg"
-	print(img_src)
-	urllib.request.urlretrieve(book_image_url, img_src)
-	book_reviews = db.execute("SELECT * FROM reviews WHERE bookid = :bookid", 
+	book_reviews = db.execute("""
+		SELECT review_rating,review_text,username 
+		FROM reviews r
+		INNER JOIN person p ON (r.personId = p.personId)
+		WHERE bookid = :bookid""", 
 		{"bookid":bookId}).fetchall()
-	img_src = "/" + img_src
+	print(book_reviews)
 	try:
 		username = session['username']
+		print(username)
 		user_review = db.execute("""
 			SELECT * FROM reviews
 			JOIN person ON (person.personid = reviews.personid)
 			WHERE username = :username AND bookid = :bookid
 			""", {"username":username, "bookid":bookId}).fetchall()
-		return render_template('book.html', book = book_result, reviews = book_reviews, user_review = user_review,image = img_src)
+		return render_template('book.html', book = book_result, reviews = book_reviews, user_review = user_review)
 	except:
 		flash('User not logged in')
 		return redirect(url_for('index'))
@@ -246,9 +248,5 @@ def api(isbn):
 	d = [dict(row) for row in data]
 	return jsonify(d[0])
 
-
-
 if __name__ == '__main__':
 	app.run(debug=True)
-
-
