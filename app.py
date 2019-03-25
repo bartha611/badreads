@@ -1,6 +1,6 @@
 import os
 import sys
-from WTF_classes import Registration, Login, SearchForm
+from WTF_classes import Registration, Login
 import urllib.request
 
 from dotenv import load_dotenv
@@ -40,6 +40,7 @@ def index():
     return render_template('index.html')
 
 
+# User registration for website
 @app.route("/register", methods = ["GET", "POST"])
 def register():
 	form = Registration()
@@ -96,18 +97,11 @@ def login():
 def logout():
 	session.pop('username', None)
 	return redirect(url_for('index'))
-	
-@app.route('/search', methods = ["GET", "POST"])
-def search():
-	form = SearchForm()
-	if request.method == "POST" and form.validate_on_submit():
-		query = request.form["search"]
-		return redirect(url_for('search_results',query=query))
-	return render_template('search.html', form=form)
 
 @app.route('/search_results', methods=["GET", "POST"])
 def search_results():
-	query = request.args.get('query')
+	query = request.args.get("query")
+	print(query)
 	try:
 		query = int(query)
 		results = db.execute("SELECT * FROM books WHERE isbn LIKE '%:isbn%'", 
@@ -132,18 +126,18 @@ def book(isbn):
 		WHERE bookid = :bookid""", 
 		{"bookid":bookId}).fetchall()
 	print(book_reviews)
-	try:
-		username = session['username']
-		print(username)
-		user_review = db.execute("""
-			SELECT * FROM reviews
-			JOIN person ON (person.personid = reviews.personid)
-			WHERE username = :username AND bookid = :bookid
-			""", {"username":username, "bookid":bookId}).fetchall()
-		return render_template('book.html', book = book_result, reviews = book_reviews, user_review = user_review)
-	except:
-		flash('User not logged in')
-		return redirect(url_for('index'))
+	# try:
+	username = session['username']
+	print(username)
+	user_review = db.execute("""
+		SELECT * FROM reviews
+		JOIN person ON (person.personid = reviews.personid)
+		WHERE username = :username AND bookid = :bookid
+		""", {"username":username, "bookid":bookId}).fetchall()
+	return render_template('book.html', book = book_result, reviews = book_reviews, user_review = user_review)
+	# except:
+	# 	flash('User not logged in')
+	# 	return redirect(url_for('index'))
 
 @app.route('/review/<isbn>', methods = ["GET","POST"])
 def review(isbn):
@@ -153,6 +147,7 @@ def review(isbn):
 		WHERE isbn = :isbn""", {"isbn":isbn}).fetchall()
 	return render_template('review_edit.html', book = review_book)
 
+#add review to database
 @app.route('/add_rating', methods = ["POST"])
 def add_rating():
 	isbn = request.json['isbn']
@@ -173,18 +168,19 @@ def add_rating():
 		db.execute("INSERT INTO reviews(review_rating, personid, bookid) VALUES (:rating, :personid, :bookid)", 
 		{"rating":stars, "personid":userid[0], "bookid":bookid[0]})
 		db.commit()
+		#update book's average review rating and total reviews
 		db.execute("""
 			UPDATE books
 				SET average_score = 
-				(SELECT AVG(reviews.review_rating)
-				FROM reviews
-				INNER JOIN books ON (reviews.bookId = books.bookId)
-				WHERE books.isbn = :isbn),
+				(SELECT AVG(r.review_rating)
+				FROM reviews r
+				INNER JOIN books b ON (r.bookId = b.bookId)
+				WHERE b.isbn = :isbn),
 				review_count = 
-				(SELECT COUNT(reviews.review_rating)
-				FROM reviews
-				INNER JOIN books ON (books.bookId = reviews.bookId)
-				WHERE books.isbn = :isbn)
+				(SELECT COUNT(r.review_rating)
+				FROM reviews r
+				INNER JOIN books b ON (b.bookId = r.bookId)
+				WHERE b.isbn = :isbn)
 			WHERE books.isbn = :isbn
 			""", {"isbn": isbn})
 		db.commit()
@@ -192,16 +188,16 @@ def add_rating():
 		db.execute("""
 			UPDATE reviews
 				SET review_rating = :stars
-			WHERE reviews.personId = :userid
-			""",{"stars":stars,"userid":userid[0]})
+			WHERE reviews.personId = :userid AND reviews.bookId = :bookid
+			""",{"stars":stars,"userid":userid[0],"bookid":bookid})
 		db.commit()
 		db.execute("""
 			UPDATE books
 				SET average_score = 
-				(SELECT AVG(reviews.review_rating)
-				FROM reviews
-				INNER JOIN books ON (reviews.bookId = books.bookId)
-				WHERE books.isbn = :isbn)
+				(SELECT AVG(r.review_rating)
+				FROM reviews r
+				INNER JOIN books b ON (r.bookId = b.bookId)
+				WHERE b.isbn = :isbn)
 			WHERE books.isbn = :isbn
 			""", {"isbn": isbn})
 		db.commit()
@@ -221,6 +217,7 @@ def get_user_rating():
 	if len(user_rating) == 0:
 		return jsonify({'user_rating': None})
 	return jsonify({'user_rating': user_rating[0].review_rating})
+	
 
 @app.route('/add_review', methods = ["POST"])
 def add_review():
@@ -233,9 +230,9 @@ def add_review():
 		WHERE username = :username""",
 		{"username":username}).first()
 	db.execute("""
-		UPDATE reviews
+		UPDATE reviews r
 			SET review_text = :review
-		WHERE reviews.personid = :userid""", {"userid":userid[0], "review":review_text})
+		WHERE r.personid = :userid AND r.bookId = :bookId""", {"userid":userid[0], "review":review_text,"bookId": review_bookid})
 	db.commit()
 	return redirect(url_for('index'))
 

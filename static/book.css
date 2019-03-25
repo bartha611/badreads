@@ -1,5 +1,9 @@
-#result {
-	width: 60%;
+body {
+	background-color: #F5F5DC;
+}
+.container {
+	max-width: 800px;
+	margin: 0 auto;
 }
 #book-content {
 	display: flex;
@@ -10,6 +14,10 @@
 }
 #author {
 	margin-top: 5px;
+}
+.text {
+	overflow-wrap: break-word;
+	font-size: 16px;
 }
 .star-rating {
 	margin-top: 10px;
@@ -22,16 +30,17 @@
 #book-info {
 	width:500px;
 	float: right;
-	text-decoration: underline;
 }
-table, th, td {
-  font-size: 15px;
+#user-review {
+	padding-bottom: 20px;
 }
-th,td {
-	width: 100px;
+#Community-reviews {
+	padding-bottom: 10px;
+	border-bottom: 1px solid #C0C0C0;
 }
 #user-activity {
-	text-decoration: underline;
+	padding: 10px;
+	border-bottom: 1px solid #C0C0C0;
 }
 #user-review {
 	display: block;

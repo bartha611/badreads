@@ -1,15 +1,18 @@
 {% extends "bootstrap/base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
+{% include "layout.html" %}
 
 {% block styles %}
 {{super()}}
 	<link rel = "stylesheet" type = "text/css" href = "{{url_for('.static',filename='login.css')}}">
 {% endblock %}
+<head>
+	{{ fontawesome_html() }}
+</head>
 
 {% block content %}
-{% include "layout.html" %}
-<div class="container">
-	<h2 id = title>Login into Badreads!</h2>
+<div class="container" id = "login">
+	<h2 class = "text-center" id = title>Login into Badreads!</h2>
 	<form id = "form_groups" method = "POST" action = {{url_for('login')}}>
 		<dl>
 			{{ wtf.quick_form(form)}}

@@ -12,10 +12,7 @@ class Registration(FlaskForm):
 	submit = SubmitField('Submit')
 
 class Login(FlaskForm):
-	email = StringField('Email', validators = [InputRequired(), Length(min=10, max=70), Email("must provide a valid email between 10 to 70 characters")])
+	email = StringField('Email', validators = [InputRequired(), Length(min=10, max=70), 
+		Email("must provide a valid email between 10 to 70 characters")],render_kw={"placeholder":"me@gmail.com"})
 	password = PasswordField('Password', validators = [InputRequired()])
-	submit = SubmitField('Submit')
-
-class SearchForm(FlaskForm):
-	search = StringField('search', validators = [InputRequired()], render_kw = {"placeholder": "Search"})
-	submit = SubmitField('Submit')
+	submit = SubmitField('Sign In')

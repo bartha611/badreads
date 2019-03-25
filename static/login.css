@@ -1,0 +1,13 @@
+body {
+	background: #f5f5dc;
+}
+.container {
+	max-width: 600px;
+}
+#login {
+	background: white;
+	padding: 10px 100px 10px 100px;
+}
+#title {
+	margin-bottom: 40px;
+}

@@ -3,8 +3,8 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-os.environ["DATABASE_URL"] = 'postgres://rstrmsgknaerel:b27002260a792f02d00ba9d23da8e41d1d7a375ea03aa44210fcf8fe4b082a86@ec2-23-23-80-20.compute-1.amazonaws.com:5432/dfofnj4eu4rg1q'
-engine = create_engine('postgres://rstrmsgknaerel:b27002260a792f02d00ba9d23da8e41d1d7a375ea03aa44210fcf8fe4b082a86@ec2-23-23-80-20.compute-1.amazonaws.com:5432/dfofnj4eu4rg1q')
+os.environ["DATABASE_URL"] = os.getenv('DATABASE_URL')
+engine = create_engine(os.getenv('DATABASE_URL'))
 db = scoped_session(sessionmaker(bind=engine))
 
 def main():

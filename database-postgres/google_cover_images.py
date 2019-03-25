@@ -11,7 +11,7 @@ def main():
 			index = 1
 			if size < 1000:
 				print(f"{isbn} has size {size} bytes")
-				google_book_url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn + '&key=AIzaSyA7LSBWRzf5_ee1zvcJAYbAtQT0lBpZLSY'
+				google_book_url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn + '&key=googleapikey'
 				response = urllib.request.urlopen(google_book_url)
 				data = json.loads(response.read())
 				try:

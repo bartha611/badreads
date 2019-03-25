@@ -1,6 +1,6 @@
 Flask
 Flask-Session
-Flask-bootstrap
+Flask-bootstrap4
 Flask-WTF
 WTForms
 Flask-login
@@ -10,3 +10,5 @@ python-dotenv
 flask-dotenv
 gunicorn
 boto
+requests
+flask-fontawesome

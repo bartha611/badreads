@@ -1,13 +1,14 @@
 {% extends "bootstrap/base.html" %}
+{% include "layout.html" %}
 
 {% block styles %}
 	<link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'book.css') }}>
 {% endblock %}
 
 {% block content %}
-{% include "layout.html" %}
 {% if book %}
-<div class="container" id="book-content">
+<body>
+<div class="container mt-5" id="book-content">
     {% for book in book %}
     <div id="book-image">
        	<img src = {{book.image_path}}>
@@ -36,25 +37,22 @@
 	{% if user_review|length != 0 %}
 	{% for review in user_review %}
 		<h4 id = "user-activity">My Activity</h4>
-		<table>
-			<tr>
-				<th>Review of</th>
-				<td>{{ book.isbn }}</td>
-			</tr>
-			<tr>
-				<th>Rating</th>
-				<td id = "user-rating">{{ review.review_rating }}</td>
-			</tr>
-			<tr>
-				{% if review.review_text %}
-				<th>Review</th>
-				<td>{{review.review_text }}</td>
-				{% else %}
-				<th>Review</th>
-				<td><a href="{{url_for('review', isbn = book.isbn)}}">Add Review</a></td>
-				{% endif %}
-			</tr>
-		</table>
+		<div class="row">
+			<div class="col-sm-3">
+				<p>Review of</p>
+			</div>
+			<div class="col-sm-9">
+				{{ book.isbn }}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-3">
+				<p>Rating</p>
+			</div>
+			<div class="col-sm-9">
+				{% include "star.html" %}
+			</div>
+		</div>
 	{% else %}
 		<h3>add review</h3>
 	{% endfor %}
@@ -64,13 +62,13 @@
 {% endif %}
 <div class = "container" id = "reviews">
 	<h4 id = "Community-reviews">Community Reviews</h4>
-	{%if reviews %}
+	{% if reviews %}
 	{% for review in reviews %}
 		<div class="row">
 			<div class="col-sm-3">{{ review.username }}</div>
-			<div class="col-sm-9">
+			<div class="col-sm-9 text">
 				<p>Rated it {{review.review_rating}} stars</p>
-				{% if review.review_text|length != 0 %}
+				{% if review.review_text %}
 				<p>{{ review.review_text }}</p>
 				{% else %}
 				<p>No review</p>
@@ -82,4 +80,5 @@
 	<h4>No reviews for this book</h4>
 	{% endif %}
 </div>
+</body>
 {% endblock %}

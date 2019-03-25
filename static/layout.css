@@ -1,0 +1,11 @@
+.search {
+	line-height: 20px;
+}
+.form-control-feedback {
+	cursor: pointer;
+	padding: 5px 10px 5px 10px;
+	outline: none;
+}
+.form-control {
+	outline: none;
+}

@@ -3,7 +3,7 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-os.environ["DATABASE_URL"] = "dababase_url"
+os.environ["DATABASE_URL"] = os.getenv('DATABASE_URL')
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 

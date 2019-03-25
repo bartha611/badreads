@@ -1,19 +1,23 @@
 {% extends "bootstrap/base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
+{% block styles %}
+{% include "layout.html" %}
+{{super()}}
+	<link rel="stylesheet" type="text/css" href= {{url_for('static',filename = "search.css")}}>
+{% endblock %}
 
 
 {% block content %}
-{% include "layout.html" %}
-<h1 class = "display-1">Results</h1>
 {% if messages %}
-	{% for messages in messages %}
-		<div class = "list-group">
-			<li class="list-group-item">
-				<h2><a href = {{ url_for('book', isbn = messages.isbn) }}>{{ messages.title }}</a></h2>
-				<h5>by {{ messages.author }}</h5>
-			</li>
-		</div>
+<div class = "container">
+	<h2>Search</h2>
+{% for messages in messages %}
+	<div class = "items">
+		<h3><a class = "links" href = {{ url_for('book', isbn = messages.isbn) }}>{{ messages.title }}</a></h2>
+		<span>by <b>{{messages.author}}</b></span>
+		</li>
+	</div>
 	{% endfor %}
+</div>
 {% else %}
 	<div>
 		No results for query
