@@ -11,32 +11,36 @@ $(document).ready(function() {
 	.done(function(data) {
 		user_rating = data.user_rating;
 		if(user_rating != null) {
-		$("#horizontal li").each(function(e) {
-			if(e < user_rating) {
-				$(this).addClass('current');
-			}
-		})
-	}
+			$(".user").each(function(obj,i) {
+				$(this).children().each(function(e) {
+					if(e < user_rating) {
+						$(this).addClass('current')
+					}
+				})
+			})
+		}
 	})
 	.fail(function() {
 		console.log("error");
 	})
-	$("#horizontal li").mouseover(function() {
+	$(".user li").mouseover(function() {
 		var total_stars = parseInt($(this).data('value'));
 		$(this).parent().children("li.star").each(function(e) {
 			if(e < total_stars) {
 				$(this).addClass('hover');
+				$(this).removeClass('not-hover')
 			}
 			else {
-				$(this).removeClass('hover');
+				$(this).addClass('not-hover');
 			}
 		})
 	}).mouseout(function() {
 			$(this).parent().children("li.star").each(function(e) {
 				$(this).removeClass('hover');
+				$(this).removeClass('not-hover')
 		})
 	});
-	$("#horizontal li").click(function() {
+	$(".user li").click(function() {
 		var total_stars = parseInt($(this).data('value'));
 		$(this).parent().children("li.star").each(function(e) {
 			if(e < total_stars) {
@@ -63,6 +67,14 @@ $(document).ready(function() {
 			console.log("error");
 		})	
 	});
+	$(".community").each(function(i,obj) {
+		var stars = parseInt($(this).data('value'))
+		$(this).children().each(function(e) {
+			if(e < stars) {
+				$(this).addClass('selected')
+			}
+		})
+	})
 
 })
 

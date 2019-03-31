@@ -1,8 +1,12 @@
-{% extends "bootstrap/base.html" %}
 {% include "layout.html" %}
 
 {% block styles %}
 	<link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'book.css') }}>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+{% endblock %}
+{% block javascript %}
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script type="text/javascript" src = {{url_for('static', filename = 'rating.js')}}></script>
 {% endblock %}
 
 {% block content %}
@@ -12,25 +16,53 @@
     {% for book in book %}
     <div id="book-image">
        	<img src = {{book.image_path}}>
-        {% include "star.html" %}
+        <div class="star-rating mt-2 pl-5">
+			<ul class = "star-rating user">
+				<li class="star" data-value = "1"><i class = "fa fa-star"></i></li>
+				<li class="star" data-value = "2"><i class="fa fa-star"></i></li>
+				<li class="star" data-value = "3"><i class="fa fa-star"></i></li>
+				<li class="star" data-value = "4"><i class="fa fa-star"></i></li>
+				<li class="star" data-value = "5"><i class="fa fa-star"></i></li>
+			</ul>
+		</div>
 	</div>
     <div id="book-info">
-        <h1 id="title">{{ book.title }}</h1>
+        <h2 id="title">{{ book.title }}</h1>
         <h3 id="author"> By {{ book.author }}</h3>
-        <table>
-            <tr>
-                <th>Year</th>
-                <td>{{ book.year }}</td>
-            </tr>
-            <tr>
-                <th>Isbn</th>
-                <td id = "book-isbn">{{ book.isbn }}</td>
-            </tr>
-            <tr>
-                <th>Rating</th>
-                <td>{{ book.average_score }}</td>
-            </tr>
-        </table>
+        <div id="average">
+        	<div class = "stars-active" style = "width:{{width_star}}%">
+				<i class = "fa fa-star"></i>
+				<i class = "fa fa-star"></i>
+				<i class = "fa fa-star"></i>
+				<i class = "fa fa-star"></i>
+				<i class = "fa fa-star"></i>
+			</div>
+			<div class = "stars-inactive" style = "width: 100%">
+				<i class = "fa fa-star"></i>
+				<i class = "fa fa-star"></i>
+				<i class = "fa fa-star"></i>
+				<i class = "fa fa-star"></i>
+				<i class = "fa fa-star"></i>
+			</div>
+		</div>
+		<div id = "average-rating-number">{{book.average_score}}</div>
+        <p>{{book.book_description }}</p>
+        <div class="row">
+        	<div class="col-sm-3">
+        		Year
+        	</div>
+        	<div class="col-sm-9">
+        		{{ book.year }}
+        	</div>
+        </div>
+        <div class="row">
+        	<div class="col-sm-3">
+        		Isbn
+        	</div>
+        	<div class="col-sm-9">
+        		{{ book.isbn }}
+        	</div>
+        </div>
     </div>
 </div>
 <div class="container" id = "user-review">
@@ -50,11 +82,29 @@
 				<p>Rating</p>
 			</div>
 			<div class="col-sm-9">
-				{% include "star.html" %}
+				 <div class="star-rating">
+					<ul class = "star-rating user">
+						<li class="star" data-value = "1"><i class = "fa fa-star"></i></li>
+						<li class="star" data-value = "2"><i class="fa fa-star"></i></li>
+						<li class="star" data-value = "3"><i class="fa fa-star"></i></li>
+						<li class="star" data-value = "4"><i class="fa fa-star"></i></li>
+						<li class="star" data-value = "5"><i class="fa fa-star"></i></li>
+					</ul>
+				</div>
 			</div>
 		</div>
-	{% else %}
-		<h3>add review</h3>
+		<div class="row">
+			<div class="col-sm-3">
+				<p>Review</p>
+			</div>
+			<div id = "user-text" class="col-sm-9">
+				{% if review.review_text %}
+				{{ review.review_text }}
+				{% else %}
+				<a href= {{url_for('review',isbn = book.isbn)}}>add review</a>
+				{% endif %}
+			</div>
+		</div>
 	{% endfor %}
 	{% endif %}
 </div>
@@ -66,15 +116,24 @@
 	{% for review in reviews %}
 		<div class="row">
 			<div class="col-sm-3">{{ review.username }}</div>
-			<div class="col-sm-9 text">
-				<p>Rated it {{review.review_rating}} stars</p>
-				{% if review.review_text %}
-				<p>{{ review.review_text }}</p>
-				{% else %}
-				<p>No review</p>
-				{% endif %}
-			</div>
+			<div class="col-sm-9 star-rating">
+				<span>Rated it</span>
+				<ul class = "community" data-value = {{review.review_rating}}>
+					<li class="star" data-value = "1"><i class = "fa fa-star"></i></li>
+					<li class="star" data-value = "2"><i class="fa fa-star"></i></li>
+					<li class="star" data-value = "3"><i class="fa fa-star"></i></li>
+					<li class="star" data-value = "4"><i class="fa fa-star"></i></li>
+					<li class="star" data-value = "5"><i class="fa fa-star"></i></li>
+				</ul>
+				<div class = "text">
+					{% if review.review_text %}
+					<p>{{ review.review_text }}</p>
+					{% else %}
+					<p>No review</p>
+					{% endif %}
+				</div>
 		</div>
+	</div>
 	{% endfor %}
 	{% else %}
 	<h4>No reviews for this book</h4>

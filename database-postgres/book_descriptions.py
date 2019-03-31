@@ -2,9 +2,8 @@ import csv,os,requests,json
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-os.environ["DATABASE_URL"] = os.getenv('DATABASE_URL')
-engine = create_engine(os.getenv("DATABASE_URL"))
-db = scoped_session(sessionmaker(bind=engine))
+os.environ["DATABASE_URL"] = os.getenv("database_url")
+engine = create_engine(os.getenv("database_url"))
 
 def main():
 	with open('books.csv') as f:
@@ -17,8 +16,8 @@ def main():
 			title.rstrip()
 			title = title.replace(" ", "+")
 			author = author.replace(" ","+")
-			api = "https://www.googleapis.com/books/v1/volumes?q=" + title + "q=inauthor:" + author + "&key=AIzaSyAb4Ee1FfZWCHCgW08UFESFw_jfzZK27x0"
-			if count > 2217:
+			api = "https://www.googleapis.com/books/v1/volumes?q=" + title + "+q=inauthor:" + author + "&key=googleApiKey"
+			if count > 4910:
 				try:
 					response = requests.get(api)
 					if response.status_code != 200:

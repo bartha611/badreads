@@ -118,6 +118,8 @@ def book(isbn):
 	print(session['username'])
 	book_result = db.execute("SELECT * FROM books WHERE isbn = :isbn",
 		{"isbn": isbn}).fetchall()
+	average_rating = book_result[0].average_score
+	width_star = round(average_rating / 5,2)*100
 	bookId = book_result[0].bookid
 	book_reviews = db.execute("""
 		SELECT review_rating,review_text,username 
@@ -125,19 +127,16 @@ def book(isbn):
 		INNER JOIN person p ON (r.personId = p.personId)
 		WHERE bookid = :bookid""", 
 		{"bookid":bookId}).fetchall()
-	print(book_reviews)
-	# try:
 	username = session['username']
-	print(username)
 	user_review = db.execute("""
 		SELECT * FROM reviews
 		JOIN person ON (person.personid = reviews.personid)
 		WHERE username = :username AND bookid = :bookid
 		""", {"username":username, "bookid":bookId}).fetchall()
-	return render_template('book.html', book = book_result, reviews = book_reviews, user_review = user_review)
+	return render_template('book.html', book = book_result, reviews = book_reviews, user_review = user_review,width_star = width_star)
 	# except:
-	# 	flash('User not logged in')
-	# 	return redirect(url_for('index'))
+	#  	flash('User not logged in')
+	#  	return redirect(url_for('index'))
 
 @app.route('/review/<isbn>', methods = ["GET","POST"])
 def review(isbn):
@@ -189,7 +188,7 @@ def add_rating():
 			UPDATE reviews
 				SET review_rating = :stars
 			WHERE reviews.personId = :userid AND reviews.bookId = :bookid
-			""",{"stars":stars,"userid":userid[0],"bookid":bookid})
+			""",{"stars":stars,"userid":userid[0],"bookid":bookid[0]})
 		db.commit()
 		db.execute("""
 			UPDATE books
@@ -234,7 +233,13 @@ def add_review():
 			SET review_text = :review
 		WHERE r.personid = :userid AND r.bookId = :bookId""", {"userid":userid[0], "review":review_text,"bookId": review_bookid})
 	db.commit()
-	return redirect(url_for('index'))
+	#reroute back to book page
+	isbn = db.execute("""
+		SELECT isbn
+		FROM books b
+		WHERE b.bookId = :bookid""",
+		{"bookid":review_bookid}).first()
+	return redirect(url_for('book', isbn = isbn[0]))
 
 @app.route('/api/<isbn>', methods = ["GET"])
 def api(isbn):

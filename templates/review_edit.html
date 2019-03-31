@@ -1,3 +1,4 @@
+{% include "layout.html" %}
 {% block styles %}
 	<link rel="stylesheet" type="text/css" href= {{ url_for('static', filename = 'review_edit.css') }}>
 {% endblock %}
@@ -9,17 +10,22 @@
 
 
 {% block content %}
-{% include "layout.html" %}
 
 {% for book in book %}
-<div class="main_content">
+<div class="main_content" style = "padding-top: 80px">
 	<div id = "book-content">
 		<h2 id = "book-title">{{book.title}}</h2>
 		<span id = "author">By {{book.author}}</span>
 	</div>
 	<div id="user_rating">
 		<label>My rating: </label>
-		<div id="stars">{% include "star.html" %}</div>
+		<div class="stars">
+			<li class="star" data-value = "1"><i class = "fa fa-star"></i></li>
+			<li class="star" data-value = "2"><i class="fa fa-star"></i></li>
+			<li class="star" data-value = "3"><i class="fa fa-star"></i></li>
+			<li class="star" data-value = "4"><i class="fa fa-star"></i></li>
+			<li class="star" data-value = "5"><i class="fa fa-star"></i></li>
+		</div>
 		<span id = "clear">Clear</span>
 	</div>
 	<div id="review_box">
@@ -27,7 +33,7 @@
 		<form method="POST" name = "reviewForm" action={{url_for('add_review',book_id = book.bookid)}}>
 			<textarea id = "review" name = "review" class = "form-control" rows = "12" placeholder = "Enter your review (optional)" maxlength = "20000"></textarea>
 			<div id = "character-count">20000 characters left</div>
-			<input type="submit" value = "Save">
+			<button type = "submit" class = "btn btn-primary">Save</button>
 		</form>
 	</div>
 </div>

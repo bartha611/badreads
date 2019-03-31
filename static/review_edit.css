@@ -22,3 +22,28 @@
 #character-count {
 	float: right;
 }
+.stars {
+	display: inline-block;
+}
+.fa-star {
+	color: #ccc;
+}
+.stars > li.current > i.fa {
+	color: orange;
+}
+.stars > li.selected > i.fa {
+	color: orange;
+}
+.stars > li.star {
+	display: inline-block;
+	cursor: pointer;
+}
+.stars > li.hover > i.fa {
+	color: yellow;
+}
+.stars > li.not-hover > i.fa {
+	color: #ccc !important;
+}
+#review {
+	margin-bottom: 5px;
+}
