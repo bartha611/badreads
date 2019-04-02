@@ -1,12 +1,12 @@
+{% include "layout.html" %}
 {% extends "bootstrap/base.html" %}
 
 {% block styles %}
 {{super()}}
-	<link rel = "stylesheet" type = "text/css" href = "{{url_for('.static',filename='login.css')}}">
+	<link rel = "stylesheet" type = "text/css" href = "{{url_for('static',filename='index.css')}}">
 {% endblock %}
 
 {% block content %}
-{% include "layout.html" %}
 
 {% with messages = get_flashed_messages() %}
 	{% if messages %}
@@ -16,4 +16,7 @@
 			{% endfor %}
 	{% endif %}
 {% endwith %}
+<div class="content container">
+	<h2 id = "website-info">Meet your next least favorite Book.</h2>
+</div>
 {% endblock %}
