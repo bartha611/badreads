@@ -5,8 +5,15 @@ body {
 }
 .content {
     padding-top: 100px;
+    height: 500px;
+    background: url('book.jpg');
+    background-repeat: no-repeat;
 }
 #website-info {
-    font-family: 'Roboto', sans-serif;
+    font-family: Roboto, sans-serif;
     text-align: center;
+}
+#warning {
+    text-align: center;
+    font-size: 30px;
 }

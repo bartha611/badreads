@@ -14,3 +14,4 @@ Then we run
 python -m flask run
 '''
 to run the website.  
+Alternatively, you can view website on [heroku apps](https://lit-plains-55005.herokuapp.com/)

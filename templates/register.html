@@ -1,3 +1,4 @@
+{% include "layout.html" %}
 {% extends "bootstrap/base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
@@ -8,9 +9,8 @@
 
 
 {% block content %}
-{% include "layout.html" %}
 <div class="container">
-	<h2 id = title>Sign into Badreads!</h2>
+	<h2 id = title>Sign Up!</h2>
 	<form id = "form_groups" method = "POST" action = {{url_for('register')}}>
 		<dl>
 			{{ wtf.quick_form(form)}}

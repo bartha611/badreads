@@ -7,16 +7,16 @@
 {% endblock %}
 
 {% block content %}
-
+<div class="content container-fluid">
 {% with messages = get_flashed_messages() %}
 	{% if messages %}
-		<div class = "alert alert-warning">
+		<div id = "warning" class = "alert alert-warning">
 			{% for message in messages %}
-				{{ message }} <br>
+				<b>{{ message }} </b><br>
 			{% endfor %}
+		</div>
 	{% endif %}
 {% endwith %}
-<div class="content container">
 	<h2 id = "website-info">Meet your next least favorite Book.</h2>
 </div>
 {% endblock %}

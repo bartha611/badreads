@@ -53,7 +53,7 @@ def register():
 			{"email": email}).fetchall()
 		check_username_exists = db.execute("SELECT username FROM person WHERE username = :username",
 			{"username":username}).fetchall()
-		if len(check_username_exists) != 0 and len(check_username_exists) != 0:
+		if len(check_username_exists) != 0 or len(check_email_exists) != 0:
 			flash(u'Email and/or username already exists!', 'error')
 			return redirect(url_for('register'))
 		db.execute("INSERT INTO person(username, password, email) VALUES (:username, :password, :email)", 
@@ -73,7 +73,6 @@ def login():
 			return redirect(url_for('index'))
 		email = request.form["email"]
 		password = request.form["password"]
-		hashed_password = generate_password_hash(password)
 		person = db.execute("SELECT username, email, password FROM person WHERE email = :email", 
 			{"email": email}).fetchall()
 		if len(person) == 0:
@@ -101,7 +100,6 @@ def logout():
 @app.route('/search_results', methods=["GET", "POST"])
 def search_results():
 	query = request.args.get("query")
-	print(query)
 	try:
 		query = int(query)
 		results = db.execute("SELECT * FROM books WHERE isbn LIKE '%:isbn%'", 
@@ -115,7 +113,6 @@ def search_results():
 
 @app.route('/book/<isbn>', methods = ["POST", "GET"])
 def book(isbn):
-	print(session['username'])
 	book_result = db.execute("SELECT * FROM books WHERE isbn = :isbn",
 		{"isbn": isbn}).fetchall()
 	average_rating = book_result[0].average_score
@@ -127,16 +124,17 @@ def book(isbn):
 		INNER JOIN person p ON (r.personId = p.personId)
 		WHERE bookid = :bookid""", 
 		{"bookid":bookId}).fetchall()
-	username = session['username']
-	user_review = db.execute("""
-		SELECT * FROM reviews
-		JOIN person ON (person.personid = reviews.personid)
-		WHERE username = :username AND bookid = :bookid
-		""", {"username":username, "bookid":bookId}).fetchall()
-	return render_template('book.html', book = book_result, reviews = book_reviews, user_review = user_review,width_star = width_star)
-	# except:
-	#  	flash('User not logged in')
-	#  	return redirect(url_for('index'))
+	try:
+		username = session['username']
+		user_review = db.execute("""
+			SELECT * FROM reviews
+			JOIN person ON (person.personid = reviews.personid)
+			WHERE username = :username AND bookid = :bookid
+			""", {"username":username, "bookid":bookId}).fetchall()
+		return render_template('book.html', book = book_result, reviews = book_reviews, user_review = user_review,width_star = width_star)
+	except:
+		flash('User not logged in')
+		return redirect(url_for('index'))
 
 @app.route('/review/<isbn>', methods = ["GET","POST"])
 def review(isbn):
